@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_color">#FDFBEE</color>"
+    <color name="important1">#FDFAF6</color>
+    <color name="important2">#E69DB8</color>
+    <color name="important3">#F7374F</color>
+    <color name="edittext_color">#57B4BA</color>
+    <color name="text_color">#015551</color>
+    <color name="text2_color">#48A6A7</color>
+    <color name="text3_color">#EB3678</color>
+    <color name="button1">#D5C7A3</color>
+    <color name="button2">#BDB395</color>
+    <color name="button3">#B9B28A</color>
+</resources>
