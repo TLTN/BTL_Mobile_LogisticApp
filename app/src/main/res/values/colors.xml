@@ -11,4 +11,13 @@
     <color name="button1">#D5C7A3</color>
     <color name="button2">#BDB395</color>
     <color name="button3">#B9B28A</color>
+    <color name="option1">#7AE2CF</color>
+    <color name="option2">#D29F80</color>
+    <color name="option3">#FF0B55</color>
+    <color name="option4">#FEBA17</color>
+    <color name="option5">#E69DB8</color>
+    <color name="insert">#1DCD9F</color>
+    <color name="update">#A89C29</color>
+    <color name="delete">#E50046</color>
+
 </resources>

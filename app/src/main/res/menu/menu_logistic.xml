@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/action_add_truck"
+        android:title="Thêm Xe Tải" />
+
+    <item
+        android:id="@+id/action_add_order"
+        android:title="Thêm Đơn Hàng" />
+
+    <item
+        android:id="@+id/action_view_orders"
+        android:title="Xem Đơn Hàng" />
+
+</menu>
