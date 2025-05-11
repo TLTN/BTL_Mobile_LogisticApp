@@ -38,7 +38,7 @@ public class trang_chu extends AppCompatActivity
     String loggedInUsername = "";
     SQLiteHelper helper;
     SQLiteDatabase db;
-    CardView cardThongKe, cardDonHang, cardXeTai, cardCaiDat;
+    CardView cardThongKe, cardDonHang, cardXeTai, cardQuanLy;
     ViewFlipper viewFlipper;
 
 
@@ -58,7 +58,7 @@ public class trang_chu extends AppCompatActivity
         cardThongKe = findViewById(R.id.card1);
         cardDonHang = findViewById(R.id.card2);
         cardXeTai = findViewById(R.id.card3);
-        cardCaiDat = findViewById(R.id.card4);
+        cardQuanLy = findViewById(R.id.card4);
         viewFlipper = findViewById(R.id.viewFlipper);
 
         tabHost = findViewById(R.id.tabhost);
@@ -185,6 +185,18 @@ public class trang_chu extends AppCompatActivity
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(trang_chu.this, xe_tai.class);
+                intent.putExtra("username", loggedInUsername);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                finish();
+            }
+        });
+        cardQuanLy.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(trang_chu.this, quan_ly.class);
                 intent.putExtra("username", loggedInUsername);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

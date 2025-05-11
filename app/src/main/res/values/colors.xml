@@ -19,5 +19,5 @@
     <color name="insert">#1DCD9F</color>
     <color name="update">#A89C29</color>
     <color name="delete">#E50046</color>
-
+    <color name="white">#FFFFFF</color>
 </resources>

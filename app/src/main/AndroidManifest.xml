@@ -54,6 +54,11 @@
             android:exported="true">
 
         </activity>
+        <activity
+            android:name=".quan_ly"
+            android:exported="true">
+
+        </activity>
     </application>
 
 </manifest>

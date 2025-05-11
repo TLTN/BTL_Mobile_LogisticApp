@@ -46,6 +46,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             "maDon TEXT PRIMARY KEY" +
             ");";
 
+    private static final String CREATE_TABLE_PHANCONG = "CREATE TABLE IF NOT EXISTS PhanCong (" +
+            "maDon TEXT, " +
+            "maXe TEXT, " +
+            "PRIMARY KEY(maDon, maXe), " +
+            "FOREIGN KEY(maDon) REFERENCES DonHang(maDon) ON DELETE CASCADE, " +
+            "FOREIGN KEY(maXe) REFERENCES Trucks(maXe) ON DELETE CASCADE" +
+            ");";
+
+
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -57,11 +66,13 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TABLE_TAIXE);
         db.execSQL(CREATE_TABLE_TRUCKS);
         db.execSQL(CREATE_TABLE_DON_HANG);
+        db.execSQL(CREATE_TABLE_PHANCONG);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS PhanCong");
             db.execSQL("DROP TABLE IF EXISTS DonHang");
             db.execSQL("DROP TABLE IF EXISTS Trucks");
             db.execSQL("DROP TABLE IF EXISTS TaiXe");
@@ -162,4 +173,49 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         return list;
     }
+
+    public void insertPhanCong(String maDon, String maXe) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("maDon", maDon);
+        values.put("maXe", maXe);
+        db.insert("PhanCong", null, values);
+    }
+
+    public void deletePhanCong(String maDon, String maXe) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete("PhanCong", "maDon = ? AND maXe = ?", new String[]{maDon, maXe});
+    }
+
+    public List<PhanCong> getAllPhanCong() {
+        List<PhanCong> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM PhanCong", null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String maDon = cursor.getString(0);
+                String maXe = cursor.getString(1);
+                list.add(new PhanCong(maDon, maXe));
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    public boolean isDonHangAssigned(String maDon, String maXe) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM DonHangXeTai WHERE maDon = ? AND maXe = ?",
+                new String[]{maDon, maXe});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        return exists;
+    }
+    public void assignDonHangToXeTai(String maDon, String maXe) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("maDon", maDon);
+        values.put("maXe", maXe);
+        db.insert("DonHangXeTai", null, values);
+    }
+
 }
