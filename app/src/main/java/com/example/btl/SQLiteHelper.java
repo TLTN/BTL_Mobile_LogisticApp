@@ -12,7 +12,7 @@ import java.util.List;
 public class SQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "MyDatabase.db";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 4;
 
     private static final String CREATE_TABLE_USERS = "CREATE TABLE IF NOT EXISTS Users (" +
             "_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -28,16 +28,22 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             "FOREIGN KEY(username) REFERENCES Users(username) ON DELETE CASCADE" +
             ");";
 
+    private static final String CREATE_TABLE_TAIXE = "CREATE TABLE IF NOT EXISTS TaiXe (" +
+            "maTaiXe TEXT PRIMARY KEY, " +
+            "tenTaiXe TEXT NOT NULL, " +
+            "sdt TEXT NOT NULL" +
+            ");";
+
     private static final String CREATE_TABLE_TRUCKS = "CREATE TABLE IF NOT EXISTS Trucks (" +
-            "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-            "name TEXT NOT NULL, " +
+            "maXe TEXT PRIMARY KEY, " +
             "plate TEXT NOT NULL, " +
-            "status TEXT NOT NULL " +
+            "status TEXT NOT NULL, " +
+            "maTaiXe TEXT, " +
+            "FOREIGN KEY(maTaiXe) REFERENCES TaiXe(maTaiXe) ON DELETE SET NULL" +
             ");";
 
     private static final String CREATE_TABLE_DON_HANG = "CREATE TABLE IF NOT EXISTS DonHang (" +
-            "maDon TEXT PRIMARY KEY, " +
-            "trangThai TEXT NOT NULL" +
+            "maDon TEXT PRIMARY KEY" +
             ");";
 
     public SQLiteHelper(Context context) {
@@ -48,6 +54,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_TABLE_USERS);
         db.execSQL(CREATE_TABLE_USER_INFO);
+        db.execSQL(CREATE_TABLE_TAIXE);
         db.execSQL(CREATE_TABLE_TRUCKS);
         db.execSQL(CREATE_TABLE_DON_HANG);
     }
@@ -55,35 +62,37 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS DonHang");
+            db.execSQL("DROP TABLE IF EXISTS Trucks");
+            db.execSQL("DROP TABLE IF EXISTS TaiXe");
             db.execSQL("DROP TABLE IF EXISTS UserInfo");
             db.execSQL("DROP TABLE IF EXISTS Users");
-            db.execSQL("DROP TABLE IF EXISTS Trucks");
-            db.execSQL("DROP TABLE IF EXISTS DonHang");
             onCreate(db);
         }
     }
 
-    public void insertTruck(String name, String plate, String status, String color) {
+    public void insertTruck(String maXe, String plate, String status, String maTaiXe) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("name", name);
+        values.put("maXe", maXe);
         values.put("plate", plate);
         values.put("status", status);
+        values.put("maTaiXe", maTaiXe);
         db.insert("Trucks", null, values);
     }
 
-    public void updateTruck(int id, String name, String plate, String status, String color) {
+    public void updateTruck(String maXe, String plate, String status, String maTaiXe) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("name", name);
         values.put("plate", plate);
         values.put("status", status);
-        db.update("Trucks", values, "id = ?", new String[]{String.valueOf(id)});
+        values.put("maTaiXe", maTaiXe);
+        db.update("Trucks", values, "maXe = ?", new String[]{maXe});
     }
 
-    public void deleteTruck(int id) {
+    public void deleteTruck(String maXe) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete("Trucks", "id = ?", new String[]{String.valueOf(id)});
+        db.delete("Trucks", "maXe = ?", new String[]{maXe});
     }
 
     public List<Truck> getAllTrucks() {
@@ -92,30 +101,22 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("SELECT * FROM Trucks", null);
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                int id = cursor.getInt(0);
-                String name = cursor.getString(1);
-                String plate = cursor.getString(2);
-                String status = cursor.getString(3);
-                list.add(new Truck(id, name, plate, status));
+                String maXe = cursor.getString(0);
+                String plate = cursor.getString(1);
+                String status = cursor.getString(2);
+                String maTaiXe = cursor.getString(3);
+                list.add(new Truck(maXe, plate, status, maTaiXe));
             }
             cursor.close();
         }
         return list;
     }
 
-    public void insertDonHang(String maDon, String trangThai) {
+    public void insertDonHang(String maDon) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("maDon", maDon);
-        values.put("trangThai", trangThai);
         db.insert("DonHang", null, values);
-    }
-
-    public void updateDonHang(String maDon, String trangThai) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("trangThai", trangThai);
-        db.update("DonHang", values, "maDon = ?", new String[]{maDon});
     }
 
     public void deleteDonHang(String maDon) {
@@ -130,8 +131,32 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 String maDon = cursor.getString(0);
-                String trangThai = cursor.getString(1);
-                list.add(new DonHang(maDon, trangThai));
+                list.add(new DonHang(maDon));
+            }
+            cursor.close();
+        }
+        return list;
+    }
+
+    public void insertTaiXe(String maTaiXe, String tenTaiXe, String sdt) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("maTaiXe", maTaiXe);
+        values.put("tenTaiXe", tenTaiXe);
+        values.put("sdt", sdt);
+        db.insert("TaiXe", null, values);
+    }
+
+    public List<TaiXe> getAllTaiXe() {
+        List<TaiXe> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM TaiXe", null);
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String maTaiXe = cursor.getString(0);
+                String tenTaiXe = cursor.getString(1);
+                String sdt = cursor.getString(2);
+                list.add(new TaiXe(maTaiXe, tenTaiXe, sdt));
             }
             cursor.close();
         }

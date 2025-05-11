@@ -33,9 +33,15 @@ public class trang_dang_nhap extends AppCompatActivity {
     }
 
     private void Event() {
-        txtRegister.setOnClickListener(view -> {
-            Intent intent = new Intent(trang_dang_nhap.this, trang_dang_ky.class);
-            startActivity(intent);
+        txtRegister.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(trang_dang_nhap.this, trang_dang_ky.class);
+                startActivity(intent);
+                finish();
+            }
         });
 
         imgTogglePass.setOnClickListener(new View.OnClickListener() {
@@ -55,35 +61,38 @@ public class trang_dang_nhap extends AppCompatActivity {
             }
         });
 
-        btnLogin.setOnClickListener(view -> {
-            String username = edtUser.getText().toString().trim();
-            String password = edtPass.getText().toString().trim();
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = edtUser.getText().toString().trim();
+                String password = edtPass.getText().toString().trim();
 
-            if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                if (TextUtils.isEmpty(username) || TextUtils.isEmpty(password)) {
+                    Toast.makeText(trang_dang_nhap.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            if (!isUsernameExist(username)) {
-                Toast.makeText(this, "Tên đăng nhập không tồn tại", Toast.LENGTH_SHORT).show();
-                return;
-            }
+                if (!isUsernameExist(username)) {
+                    Toast.makeText(trang_dang_nhap.this, "Tên đăng nhập không tồn tại", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-            if (isLoginValid(username, password)) {
-                new AlertDialog.Builder(this)
-                        .setTitle("Đăng nhập thành công")
-                        .setMessage("Chuyển đến trang chính?")
-                        .setPositiveButton("OK", (dialog, which) -> {
-                            Intent intent = new Intent(trang_dang_nhap.this, trang_chu.class);
-                            intent.putExtra("username", username);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(intent);
-                            finish();
-                        })
-                        .setCancelable(false)
-                        .show();
-            } else {
-                Toast.makeText(this, "Mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                if (isLoginValid(username, password)) {
+                    new AlertDialog.Builder(trang_dang_nhap.this)
+                            .setTitle("Đăng nhập thành công")
+                            .setMessage("Chuyển đến trang chính?")
+                            .setPositiveButton("OK", (dialog, which) -> {
+                                Intent intent = new Intent(trang_dang_nhap.this, trang_chu.class);
+                                intent.putExtra("username", username);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
+                                finish();
+                            })
+                            .setCancelable(false)
+                            .show();
+                } else {
+                    Toast.makeText(trang_dang_nhap.this, "Mật khẩu không đúng", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
