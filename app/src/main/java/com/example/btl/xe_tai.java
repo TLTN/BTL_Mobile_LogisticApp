@@ -2,6 +2,8 @@ package com.example.btl;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
@@ -127,12 +129,23 @@ public class xe_tai extends AppCompatActivity {
 
     private void loadData() {
         list = db.getAllTrucks();
+
+        list.sort((t1, t2) -> t1.getMaXe().compareToIgnoreCase(t2.getMaXe()));
+
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
         for (Truck t : list) {
-            adapter.add(t.getMaXe() + " - " + t.getPlate());
+            adapter.add(t.getMaXe() + "\n" + t.getPlate());
         }
         lvTrucks.setAdapter(adapter);
         selectedIndex = -1;
+    }
+    private void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void navigateBack() {
+        startActivity(new Intent(xe_tai.this, trang_chu.class));
+        finish();
     }
 
     private void clearFields() {

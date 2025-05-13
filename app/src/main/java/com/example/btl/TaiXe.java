@@ -1,5 +1,7 @@
 package com.example.btl;
 
+import java.util.List;
+
 public class TaiXe {
     private String maTaiXe;
     private String tenTaiXe;
@@ -10,6 +12,7 @@ public class TaiXe {
         this.tenTaiXe = tenTaiXe;
         this.sdt = sdt;
     }
+
 
     public String getMaTaiXe() {
         return maTaiXe;

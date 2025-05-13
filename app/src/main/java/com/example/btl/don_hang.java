@@ -34,8 +34,6 @@ public class don_hang extends AppCompatActivity {
         Event();
         loadData();
     }
-
-
     private void Init() {
         edtOrderCode = findViewById(R.id.edtOrderCode);
         btnInsert = findViewById(R.id.btnInsertDonHang);
@@ -87,14 +85,6 @@ public class don_hang extends AppCompatActivity {
                 finish();
             }
         });
-
-//        btnInsert.setOnClickListener(v -> insertDonHang());
-//        btnUpdate.setOnClickListener(v -> updateDonHang());
-//        btnDelete.setOnClickListener(v -> deleteDonHang());
-//
-//        btnUpdate.setOnClickListener(v -> updateDonHang());
-//        btnDelete.setOnClickListener(v -> deleteDonHang());
-//        btnBack.setOnClickListener(v -> navigateBack());
     }
 
     private void LoadUsername() {
@@ -111,10 +101,9 @@ public class don_hang extends AppCompatActivity {
             }
             cursor.close();
         }
+        list.sort(String::compareToIgnoreCase);
         adapter.notifyDataSetChanged();
-
     }
-
 
     void insertDonHang() {
         String maDon = edtOrderCode.getText().toString().trim();

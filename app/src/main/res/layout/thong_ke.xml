@@ -1,6 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="@color/background_color">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineTop"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.1" />
+
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/back"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        app:layout_constraintTop_toBottomOf="@id/guidelineTop"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/tvTitle"
+        android:elevation="4dp" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Thống kê Logistics"
+        android:textSize="28sp"
+        android:textColor="@color/text2_color"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toTopOf="@id/btnBack"
+        app:layout_constraintStart_toEndOf="@id/btnBack"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:elevation="4dp" /> <!-- Thêm độ bóng cho tiêu đề -->
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardStats"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="6dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:layout_gravity="center">
+
+            <TextView
+                android:id="@+id/tvTongDon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng số đơn hàng: 0"
+                android:textSize="18sp"
+                android:textColor="@color/text_color"
+                android:layout_marginBottom="6dp" />
+
+            <TextView
+                android:id="@+id/tvDonDangGiao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đơn đang giao: 0"
+                android:textSize="16sp"
+                android:textColor="@color/text2_color" />
+
+            <TextView
+                android:id="@+id/tvDonHuy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đơn bị hủy: 0"
+                android:textSize="16sp"
+                android:textColor="@color/text2_color" />
+
+            <TextView
+                android:id="@+id/tvDonDaGiao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Đơn đã giao: 0"
+                android:textColor="@color/text2_color"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvTongXe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng số xe tải: 0"
+                android:textSize="18sp"
+                android:textColor="@color/text_color"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvXeDangHoatDong"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xe đang hoạt động: 0"
+                android:textSize="16sp"
+                android:textColor="@color/text2_color" />
+
+            <TextView
+                android:id="@+id/tvXeChuaCoDon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Xe chưa có đơn: 0"
+                android:textSize="16sp"
+                android:textColor="@color/text2_color" />
+
+            <TextView
+                android:id="@+id/tvTongTaiXe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tổng số tài xế: 0"
+                android:textSize="18sp"
+                android:textColor="@color/text_color"
+                android:layout_marginTop="12dp" />
+
+            <TextView
+                android:id="@+id/tvTaiXeChuaCoXe"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tài xế chưa có xe: 0"
+                android:textSize="16sp"
+                android:textColor="@color/text2_color" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <TextView
+        android:id="@+id/tvChiTiet"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Chi tiết gần đây"
+        android:textSize="18sp"
+        android:textColor="@color/important2"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/cardStats"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ListView
+        android:id="@+id/lvThongKe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@color/option1"
+        android:divider="@color/option3"
+        android:dividerHeight="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvChiTiet"
+        app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

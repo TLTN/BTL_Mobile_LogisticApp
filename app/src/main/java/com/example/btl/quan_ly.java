@@ -33,6 +33,9 @@ public class quan_ly extends AppCompatActivity {
     private ArrayAdapter<String> xeTaiAdapter;
     private ArrayAdapter<String> ganListAdapter;
     private List<String> danhSachGianDonHang = new ArrayList<>();
+    List<PhanCong> phanCongList;
+    List<ThongKe> thongKeList;
+    private int selectedIndex = -1;
     private String username;
 
     @Override
@@ -60,7 +63,18 @@ public class quan_ly extends AppCompatActivity {
                 String selectedDonHang = (String) spinnerDonHang.getSelectedItem();
                 String selectedXeTai = (String) spinnerXeTai.getSelectedItem();
 
-                if (selectedDonHang != null && selectedXeTai != null) {
+                if (selectedDonHang != null && selectedXeTai != null)
+                {
+                    dbHelper.insertPhanCong(selectedDonHang, selectedXeTai);
+                    dbHelper.updateTruckStatus(selectedXeTai, "Đang hoạt động");
+                    dbHelper.insertThongKe(selectedDonHang, selectedXeTai);
+                    loadDonHangData();
+                    loadXeTaiData();
+                    spinnerDonHang.setSelection(0);
+                    spinnerXeTai.setSelection(0);
+                    selectedIndex = -1;
+
+
                     String item = "Đơn: " + selectedDonHang + " \nXe: " + selectedXeTai;
                     danhSachGianDonHang.add(item);
                     ganListAdapter.notifyDataSetChanged();
@@ -93,25 +107,35 @@ public class quan_ly extends AppCompatActivity {
 
     private void loadDonHangData() {
         donHangList = dbHelper.getAllDonHang();
+
+        donHangList.sort((d1, d2) -> d1.getMaDon().compareToIgnoreCase(d2.getMaDon()));
+
         List<String> donHangNames = new ArrayList<>();
         for (DonHang donHang : donHangList) {
             donHangNames.add(donHang.getMaDon());
         }
+
         donHangAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, donHangNames);
         donHangAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDonHang.setAdapter(donHangAdapter);
     }
 
+
     private void loadXeTaiData() {
         truckList = dbHelper.getAllTrucks();
+
+        truckList.sort((t1, t2) -> t1.getMaXe().compareToIgnoreCase(t2.getMaXe()));
+
         List<String> truckNames = new ArrayList<>();
         for (Truck truck : truckList) {
             truckNames.add(truck.getMaXe());
         }
+
         xeTaiAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, truckNames);
         xeTaiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerXeTai.setAdapter(xeTaiAdapter);
     }
+
 
     private void setupAdapters() {
         ganListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, danhSachGianDonHang);
