@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">BTL</string>
+    <string-array name="filter_options">
+        <item>Ngày</item>
+        <item>Tuần</item>
+        <item>Tháng</item>
+        <item>Năm</item>
+    </string-array>
 </resources>
+

@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -16,25 +17,25 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.button.MaterialButton;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class quan_ly extends AppCompatActivity {
 
     private Spinner spinnerDonHang, spinnerXeTai;
     private MaterialButton btnGan;
     private ListView lvGan;
-    private TextView tvTitle;
     private ImageView btnBack;
-    private SQLiteHelper dbHelper;
+    private SQLiteHelper db;
     private List<DonHang> donHangList;
     private List<Truck> truckList;
+    private List<PhanCong> phanCongList;
     private ArrayAdapter<String> donHangAdapter;
     private ArrayAdapter<String> xeTaiAdapter;
-    private ArrayAdapter<String> ganListAdapter;
-    private List<String> danhSachGianDonHang = new ArrayList<>();
-    List<PhanCong> phanCongList;
-    List<ThongKe> thongKeList;
+    private ArrayAdapter<String> phanCongAdapter;
     private int selectedIndex = -1;
     private String username;
 
@@ -43,20 +44,27 @@ public class quan_ly extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.quan_ly);
 
-        dbHelper = new SQLiteHelper(this);
+        Init();
+        LoadUsername();
+        loadDonHangData();
+        loadXeTaiData();
+        Event();
+        loadPhanCongList();
+    }
+
+    private void Init()
+    {
+        db = new SQLiteHelper(this);
 
         spinnerDonHang = findViewById(R.id.spinnerDonHang);
         spinnerXeTai = findViewById(R.id.spinnerXeTai);
         btnGan = findViewById(R.id.btnGan);
         btnBack = findViewById(R.id.btnBack);
         lvGan = findViewById(R.id.lvGan);
-        tvTitle = findViewById(R.id.tvTitle);
+    }
 
-        LoadUsername();
-        loadDonHangData();
-        loadXeTaiData();
-        setupAdapters();
-
+    private void Event()
+    {
         btnGan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,20 +73,17 @@ public class quan_ly extends AppCompatActivity {
 
                 if (selectedDonHang != null && selectedXeTai != null)
                 {
-                    dbHelper.insertPhanCong(selectedDonHang, selectedXeTai);
-                    dbHelper.updateTruckStatus(selectedXeTai, "Đang hoạt động");
-                    dbHelper.insertThongKe(selectedDonHang, selectedXeTai);
+                    String timestamp = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault()).format(new Date());
+                    db.insertPhanCong(selectedDonHang, selectedXeTai, timestamp);
+                    db.updateTruckStatus(selectedXeTai, "Đang hoạt động");
                     loadDonHangData();
                     loadXeTaiData();
                     spinnerDonHang.setSelection(0);
                     spinnerXeTai.setSelection(0);
                     selectedIndex = -1;
 
-
-                    String item = "Đơn: " + selectedDonHang + " \nXe: " + selectedXeTai;
-                    danhSachGianDonHang.add(item);
-                    ganListAdapter.notifyDataSetChanged();
                     Toast.makeText(quan_ly.this, "Đã gán đơn hàng cho xe tải", Toast.LENGTH_SHORT).show();
+                    loadPhanCongList();
                 }
             }
         });
@@ -94,19 +99,40 @@ public class quan_ly extends AppCompatActivity {
             }
         });
 
-        lvGan.setOnItemClickListener((parent, view, position, id) -> {
-            String item = danhSachGianDonHang.get(position);
-            showDeleteConfirmationDialog(position, item);
+        lvGan.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                String item = (String) parent.getItemAtPosition(position);
+                showDeleteConfirmationDialog(position, item);
+                return true;
+            }
         });
-    }
 
+    }
     private void LoadUsername() {
         Intent intent = getIntent();
         username = intent.getStringExtra("username");
     }
+    private void loadPhanCongList() {
+        phanCongList = db.get3LatestPhanCong();
+
+        phanCongAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1);
+
+        if (phanCongList != null && !phanCongList.isEmpty()) {
+            for (PhanCong phanCong : phanCongList) {
+                phanCongAdapter.add("Đơn: " + phanCong.getMaDon() + "\nXe: " + phanCong.getMaXe());
+            }
+        } else {
+            phanCongAdapter.add("Không có dữ liệu phân công");
+        }
+
+        lvGan.setAdapter(phanCongAdapter);
+        selectedIndex = -1;
+    }
+
 
     private void loadDonHangData() {
-        donHangList = dbHelper.getAllDonHang();
+        donHangList = db.getAllDonHang();
 
         donHangList.sort((d1, d2) -> d1.getMaDon().compareToIgnoreCase(d2.getMaDon()));
 
@@ -120,9 +146,8 @@ public class quan_ly extends AppCompatActivity {
         spinnerDonHang.setAdapter(donHangAdapter);
     }
 
-
     private void loadXeTaiData() {
-        truckList = dbHelper.getAllTrucks();
+        truckList = db.getAllTrucks();
 
         truckList.sort((t1, t2) -> t1.getMaXe().compareToIgnoreCase(t2.getMaXe()));
 
@@ -136,12 +161,6 @@ public class quan_ly extends AppCompatActivity {
         spinnerXeTai.setAdapter(xeTaiAdapter);
     }
 
-
-    private void setupAdapters() {
-        ganListAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, danhSachGianDonHang);
-        lvGan.setAdapter(ganListAdapter);
-    }
-
     private void showDeleteConfirmationDialog(final int position, final String item) {
         new AlertDialog.Builder(quan_ly.this)
                 .setTitle("Xác nhận xóa")
@@ -149,13 +168,24 @@ public class quan_ly extends AppCompatActivity {
                 .setPositiveButton("Xóa", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // Xóa phần tử khỏi danh sách
-                        danhSachGianDonHang.remove(position);
-                        ganListAdapter.notifyDataSetChanged();
-                        Toast.makeText(quan_ly.this, "Đã xóa thành công", Toast.LENGTH_SHORT).show();
+                        PhanCong pc = phanCongList.get(position);
+                        int rowsAffected = db.deletePhanCong(pc.getMaDon(), pc.getMaXe(), pc.getTimestamp());
+
+                        if (rowsAffected > 0) {
+                            phanCongList.remove(position);
+                            phanCongAdapter.remove(item);
+                            phanCongAdapter.notifyDataSetChanged();
+                            loadPhanCongList();
+                            Toast.makeText(quan_ly.this, "Đã xóa thành công", Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            Toast.makeText(quan_ly.this, "Không thể xóa phân công này", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 })
                 .setNegativeButton("Hủy", null)
                 .show();
     }
+
 }

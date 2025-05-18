@@ -5,25 +5,24 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ViewFlipper;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
-import androidx.cursoradapter.widget.SimpleCursorAdapter;
-
-import com.google.firebase.Firebase;
+import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,15 +35,13 @@ public class trang_chu extends AppCompatActivity
     EditText edtFullName, edtBirthDate;
     TextView tvUser, tvName;
     String loggedInUsername = "";
-    SQLiteHelper helper;
-    SQLiteDatabase db;
+    SQLiteHelper db;
     CardView cardThongKe, cardDonHang, cardXeTai, cardQuanLy, cardTaiXe;
-
-
+    LinearLayout layoutXe;
 
     private void Init() {
-        helper = new SQLiteHelper(this);
-        db = helper.getWritableDatabase();
+        db = new SQLiteHelper(this);
+
         btnSave = findViewById(R.id.btnSave);
         btnChangePassword = findViewById(R.id.btnChangePassword);
         btnLogout = findViewById(R.id.btnLogout);
@@ -100,7 +97,7 @@ public class trang_chu extends AppCompatActivity
 
         tvUser.setText(loggedInUsername);
 
-        Cursor cursor = db.rawQuery("SELECT fullname, birthdate FROM UserInfo WHERE username=?", new String[]{loggedInUsername});
+        Cursor cursor = db.getReadableDatabase().rawQuery("SELECT fullname, birthdate FROM UserInfo WHERE username=?", new String[]{loggedInUsername});
         if (cursor != null && cursor.moveToFirst()) {
             int fullNameIndex = cursor.getColumnIndex("fullname");
             int birthDateIndex = cursor.getColumnIndex("birthdate");
@@ -115,12 +112,31 @@ public class trang_chu extends AppCompatActivity
                 Toast.makeText(this, "Không tìm thấy cột fullname hoặc birthdate", Toast.LENGTH_SHORT).show();
             }
             cursor.close();
+
         }
     }
 
-
     private void Event()
     {
+        btnChangePassword.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v) {
+                if (edtCurrent.getVisibility() == View.GONE) {
+                    edtCurrent.setVisibility(View.VISIBLE);
+                    edtNew.setVisibility(View.VISIBLE);
+                    edtConfirm.setVisibility(View.VISIBLE);
+                } else {
+                    edtCurrent.setText("");
+                    edtNew.setText("");
+                    edtConfirm.setText("");
+                    edtCurrent.setVisibility(View.GONE);
+                    edtNew.setVisibility(View.GONE);
+                    edtConfirm.setVisibility(View.GONE);
+                }
+            }
+        });
+
         btnSave.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -131,22 +147,64 @@ public class trang_chu extends AppCompatActivity
                     Toast.makeText(trang_chu.this, "Vui lòng nhập họ tên và ngày sinh", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
                 if (!isValidDate(birth)) {
                     Toast.makeText(trang_chu.this, "Ngày sinh không đúng định dạng (dd/mm/yyyy)", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Cursor cursor = db.rawQuery("SELECT * FROM UserInfo WHERE username=?", new String[]{loggedInUsername});
+
+                Cursor cursor = db.getReadableDatabase().rawQuery("SELECT * FROM UserInfo WHERE username=?", new String[]{loggedInUsername});
                 ContentValues values = new ContentValues();
                 values.put("username", loggedInUsername);
                 values.put("fullname", name);
                 values.put("birthdate", birth);
                 if (cursor.moveToFirst()) {
-                    db.update("UserInfo", values, "username=?", new String[]{loggedInUsername});
+                    db.getWritableDatabase().update("UserInfo", values, "username=?", new String[]{loggedInUsername});
                 } else {
-                    db.insert("UserInfo", null, values);
+                    db.getWritableDatabase().insert("UserInfo", null, values);
                 }
                 cursor.close();
-                Toast.makeText(trang_chu.this, "Lưu thông tin thành công", Toast.LENGTH_SHORT).show();
+
+                if (edtCurrent.getVisibility() == View.VISIBLE) {
+                    String current = edtCurrent.getText().toString().trim();
+                    String newPass = edtNew.getText().toString().trim();
+                    String confirm = edtConfirm.getText().toString().trim();
+                    if (current.isEmpty() || newPass.isEmpty() || confirm.isEmpty()) {
+                        Toast.makeText(trang_chu.this, "Vui lòng nhập đầy đủ thông tin mật khẩu", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Cursor c = db.getWritableDatabase().rawQuery("SELECT password FROM Users WHERE username=?", new String[]{loggedInUsername});
+                    if (c.moveToFirst()) {
+                        int colPass = c.getColumnIndex("password");
+                        if (colPass >= 0) {
+                            String oldPass = c.getString(colPass);
+                            if (!oldPass.equals(current)) {
+                                Toast.makeText(trang_chu.this, "Mật khẩu hiện tại không đúng", Toast.LENGTH_SHORT).show();
+                                c.close();
+                                return;
+                            }
+                            if (!newPass.equals(confirm)) {
+                                Toast.makeText(trang_chu.this, "Mật khẩu mới không khớp", Toast.LENGTH_SHORT).show();
+                                c.close();
+                                return;
+                            }
+                            ContentValues passUpdate = new ContentValues();
+                            passUpdate.put("password", newPass);
+                            db.getWritableDatabase().update("Users", passUpdate, "username=?", new String[]{loggedInUsername});
+                            Toast.makeText(trang_chu.this, "Đổi mật khẩu thành công", Toast.LENGTH_SHORT).show();
+                            edtCurrent.setText("");
+                            edtNew.setText("");
+                            edtConfirm.setText("");
+                            edtCurrent.setVisibility(View.GONE);
+                            edtNew.setVisibility(View.GONE);
+                            edtConfirm.setVisibility(View.GONE);
+                        }
+                    }
+                    c.close();
+                } else {
+                    Toast.makeText(trang_chu.this, "Lưu thông tin thành công", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -217,11 +275,96 @@ public class trang_chu extends AppCompatActivity
         });
     }
 
+    private void loadXeTaiData()
+    {
+        List<Truck> danhSachXe = db.getAllTrucks();
+
+        for (Truck xe : danhSachXe)
+        {
+            CardView cardView = new CardView(this);
+            cardView.setLayoutParams(new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    dpToPx(100)
+            ));
+            ((LinearLayout.LayoutParams) cardView.getLayoutParams()).setMargins(0, 0, 0, dpToPx(25));
+            cardView.setRadius(dpToPx(20));
+            cardView.setCardElevation(dpToPx(6));
+
+            String trangThai = xe.getStatus();
+            int bgColor = R.color.button3;
+            if ("Đang hoạt động".equalsIgnoreCase(trangThai)) {
+                bgColor = R.color.button1;
+            } else if ("Chờ điều phối".equalsIgnoreCase(trangThai)) {
+                bgColor = R.color.button2;
+            }
+            cardView.setCardBackgroundColor(ContextCompat.getColor(this, bgColor));
+
+            LinearLayout container = new LinearLayout(this);
+            container.setOrientation(LinearLayout.HORIZONTAL);
+            container.setPadding(dpToPx(10), dpToPx(10), dpToPx(10), dpToPx(10));
+            container.setGravity(Gravity.CENTER_VERTICAL);
+
+            ImageView imageView = new ImageView(this);
+            LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(dpToPx(75), dpToPx(75));
+            imageView.setLayoutParams(imageParams);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setImageResource(R.drawable.container);
+            container.addView(imageView);
+
+            LinearLayout textContainer = new LinearLayout(this);
+            textContainer.setOrientation(LinearLayout.VERTICAL);
+            textContainer.setPadding(dpToPx(10), 0, 0, 0);
+            LinearLayout.LayoutParams textLayoutParams = new LinearLayout.LayoutParams(
+                    0, ViewGroup.LayoutParams.WRAP_CONTENT, 1
+            );
+            textContainer.setLayoutParams(textLayoutParams);
+
+            TextView txtTenXe = new TextView(this);
+            txtTenXe.setText("Xe Tải " + xe.getMaXe());
+            txtTenXe.setTextSize(18);
+            txtTenXe.setTextColor(ContextCompat.getColor(this, R.color.text_color));
+
+            TextView txtBienSo = new TextView(this);
+            txtBienSo.setText("Biển số: " + xe.getPlate());
+            txtBienSo.setTextSize(14);
+            txtBienSo.setTextColor(ContextCompat.getColor(this, R.color.text2_color));
+
+            TextView txtTrangThai = new TextView(this);
+            txtTrangThai.setText("Trạng thái: " + trangThai);
+            txtTrangThai.setTextSize(14);
+            int colorTrangThai = R.color.text3_color;
+            if ("Đang hoạt động".equalsIgnoreCase(trangThai))
+            {
+                colorTrangThai = R.color.text3_color;
+            }
+            else if ("Chờ điều phối".equalsIgnoreCase(trangThai))
+            {
+                colorTrangThai = R.color.important1;
+            }
+            txtTrangThai.setTextColor(ContextCompat.getColor(this, colorTrangThai));
+
+            textContainer.addView(txtTenXe);
+            textContainer.addView(txtBienSo);
+            textContainer.addView(txtTrangThai);
+
+            container.addView(textContainer);
+            cardView.addView(container);
+            layoutXe.addView(cardView);
+        }
+    }
+
+    private int dpToPx(int dp)
+    {
+        return (int) TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trang_chu);
         Init();
         LoadUserInfo();
+        loadXeTaiData();
         Event();
     }
 }

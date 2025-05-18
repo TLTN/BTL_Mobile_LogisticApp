@@ -57,7 +57,7 @@ public class xe_tai extends AppCompatActivity {
                     Toast.makeText(xe_tai.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                db.insertTruck(maXe, bienSo, "Đang hoạt động", null);
+                db.insertTruck(maXe, bienSo, "Chờ điều phối", null);
                 Toast.makeText(xe_tai.this, "Đã thêm xe tải", Toast.LENGTH_SHORT).show();
                 clearFields();
                 loadData();
@@ -77,7 +77,7 @@ public class xe_tai extends AppCompatActivity {
                     Toast.makeText(xe_tai.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                db.updateTruck(maXe, bienSo, "Đang hoạt động", null);
+                db.updateTruck(maXe, bienSo, "Chờ điều phối", null);
                 Toast.makeText(xe_tai.this, "Đã cập nhật xe tải", Toast.LENGTH_SHORT).show();
                 clearFields();
                 loadData();
