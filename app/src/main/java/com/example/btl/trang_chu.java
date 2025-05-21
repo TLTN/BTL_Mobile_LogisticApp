@@ -21,8 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +41,8 @@ public class trang_chu extends AppCompatActivity
     SQLiteHelper db;
     CardView cardThongKe, cardDonHang, cardXeTai, cardQuanLy, cardTaiXe;
     LinearLayout layoutXe;
+    TextView donHangDangGiao, donHangHoanTat, donHangHomNay;
+    List<PhanCong> phanCongList;
 
     private void Init() {
         db = new SQLiteHelper(this);
@@ -57,6 +62,10 @@ public class trang_chu extends AppCompatActivity
         cardXeTai = findViewById(R.id.card3);
         cardQuanLy = findViewById(R.id.card4);
         cardTaiXe = findViewById(R.id.card5);
+        layoutXe = findViewById(R.id.linearCardview);
+        donHangDangGiao = findViewById(R.id.donhangDangGiao);
+        donHangHoanTat = findViewById(R.id.donHangHoanTat);
+        donHangHomNay = findViewById(R.id.donHangHomNay);
 
         tabHost = findViewById(R.id.tabhost);
         tabHost.setup();
@@ -64,25 +73,33 @@ public class trang_chu extends AppCompatActivity
         tab1.setIndicator("Trang chủ");
         tab1.setContent(R.id.tab1);
         tabHost.addTab(tab1);
+        tabCurrent = tabHost.getCurrentTab();
+
         TabHost.TabSpec tab2 = tabHost.newTabSpec("Tab2");
         tab2.setIndicator("Danh sách");
         tab2.setContent(R.id.tab2);
         tabHost.addTab(tab2);
+        tabCurrent = tabHost.getCurrentTab();
+
         TabHost.TabSpec tab3 = tabHost.newTabSpec("Tab3");
         tab3.setIndicator("Cá nhân");
         tab3.setContent(R.id.tab3);
         tabHost.addTab(tab3);
+        tabCurrent = tabHost.getCurrentTab();
+
         tabHost.setCurrentTab(tabCurrent);
     }
 
-    private boolean isValidDate(String date) {
+    private boolean isValidDate(String date)
+    {
         String regex = "^(0[1-9]|[12][0-9]|3[01])/(0[1-9]|1[0-2])/(\\d{4})$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(date);
         return matcher.matches();
     }
 
-    private void LoadUserInfo() {
+    private void LoadUserInfo()
+    {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
         if (bundle != null) {
@@ -112,7 +129,6 @@ public class trang_chu extends AppCompatActivity
                 Toast.makeText(this, "Không tìm thấy cột fullname hoặc birthdate", Toast.LENGTH_SHORT).show();
             }
             cursor.close();
-
         }
     }
 
@@ -274,7 +290,6 @@ public class trang_chu extends AppCompatActivity
             }
         });
     }
-
     private void loadXeTaiData()
     {
         List<Truck> danhSachXe = db.getAllTrucks();
@@ -359,12 +374,36 @@ public class trang_chu extends AppCompatActivity
                 TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
+    private void loadDonHang()
+    {
+        phanCongList = db.getAllPhanCong();
+        String ngayHomNay = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
+
+        int tongDonHomNay = 0;
+        int soDonDangGiao = 0;
+
+        for (PhanCong p : phanCongList) {
+            if (p.getNgayGiao().equals(ngayHomNay)) {
+                tongDonHomNay++;
+                if (p.getMaXe() != null && !p.getMaXe().isEmpty()) {
+                    soDonDangGiao++;
+                }
+            }
+        }
+
+        donHangHomNay.setText(String.valueOf(tongDonHomNay));
+        donHangDangGiao.setText(String.valueOf(soDonDangGiao));
+        donHangHoanTat.setText(String.valueOf(tongDonHomNay - soDonDangGiao));
+
+    }
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.trang_chu);
         Init();
         LoadUserInfo();
         loadXeTaiData();
+        loadDonHang();
         Event();
     }
 }

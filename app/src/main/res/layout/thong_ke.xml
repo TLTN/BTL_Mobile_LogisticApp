@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.02" />
 
     <ImageView
         android:id="@+id/btnBack"
@@ -65,8 +65,7 @@
                 android:layout_height="wrap_content"
                 android:text="Tổng số đơn hàng: 0"
                 android:textSize="18sp"
-                android:textColor="@color/text_color"
-                android:layout_marginBottom="6dp" />
+                android:textColor="@color/text_color" />
             <TextView
                 android:id="@+id/tvTongXe"
                 android:layout_width="match_parent"
@@ -91,7 +90,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Chi tiết gần đây"
-        android:textSize="18sp"
+        android:textSize="22sp"
         android:textColor="@color/important2"
         android:textStyle="bold"
         android:layout_marginTop="16dp"

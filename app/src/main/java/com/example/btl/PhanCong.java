@@ -22,4 +22,12 @@ public class PhanCong {
     public String getTimestamp() {
         return timestamp;
     }
+
+    public String getNgayGiao() {
+        if (timestamp == null || !timestamp.contains(" ")) {
+            return "";
+        }
+        String[] parts = timestamp.split(" ");
+        return parts[0];
+    }
 }

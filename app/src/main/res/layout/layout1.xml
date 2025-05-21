@@ -122,6 +122,7 @@
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/donHangHomNay"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="28"
@@ -159,6 +160,7 @@
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/donhangDangGiao"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="12"
@@ -196,6 +198,7 @@
                         android:textSize="18sp" />
 
                     <TextView
+                        android:id="@+id/donHangHoanTat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="50"
@@ -207,8 +210,6 @@
 
         </LinearLayout>
     </HorizontalScrollView>
-
-
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"

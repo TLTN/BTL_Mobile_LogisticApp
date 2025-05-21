@@ -17,7 +17,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     public SQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS Users (" +
