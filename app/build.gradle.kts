@@ -2,9 +2,7 @@
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.google.gms.google.services) // Giữ cái này
-    // Không thêm dòng id("com.google.gms.google-services")
-    // Không thêm id("com.android.application") nếu đã dùng alias
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -35,6 +33,14 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    packagingOptions {
+        resources.excludes += "META-INF/INDEX.LIST"
+        resources.excludes += "META-INF/LICENSE"
+        resources.excludes += "META-INF/LICENSE.txt"
+        resources.excludes += "META-INF/NOTICE"
+        resources.excludes += "META-INF/DEPENDENCIES"
+        resources.excludes += "META-INF/io.netty.versions.properties"
+    }
 
     buildToolsVersion = "35.0.0"
 }
@@ -48,6 +54,8 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.13.0"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database")
+
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.0")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

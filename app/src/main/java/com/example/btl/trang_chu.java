@@ -43,6 +43,7 @@ public class trang_chu extends AppCompatActivity
     LinearLayout layoutXe;
     TextView donHangDangGiao, donHangHoanTat, donHangHomNay;
     List<PhanCong> phanCongList;
+    int count;
 
     private void Init() {
         db = new SQLiteHelper(this);
@@ -102,8 +103,10 @@ public class trang_chu extends AppCompatActivity
     {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
-        if (bundle != null) {
+        if (bundle != null)
+        {
             loggedInUsername = bundle.getString("username", "");
+            count = bundle.getInt("count", 0);
         }
 
         if (loggedInUsername == null || loggedInUsername.isEmpty()) {
@@ -380,20 +383,21 @@ public class trang_chu extends AppCompatActivity
         String ngayHomNay = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
 
         int tongDonHomNay = 0;
-        int soDonDangGiao = 0;
+//        int soDonDangGiao = 0;
 
         for (PhanCong p : phanCongList) {
-            if (p.getNgayGiao().equals(ngayHomNay)) {
+            if (p.getNgayGiao().equals(ngayHomNay))
+            {
                 tongDonHomNay++;
-                if (p.getMaXe() != null && !p.getMaXe().isEmpty()) {
-                    soDonDangGiao++;
-                }
+//                if (p.getMaXe() != null && !p.getMaXe().isEmpty())
+//                    soDonDangGiao++;
             }
         }
 
         donHangHomNay.setText(String.valueOf(tongDonHomNay));
-        donHangDangGiao.setText(String.valueOf(soDonDangGiao));
-        donHangHoanTat.setText(String.valueOf(tongDonHomNay - soDonDangGiao));
+        donHangDangGiao.setText(String.valueOf(tongDonHomNay - count));
+//        donHangHoanTat.setText(String.valueOf(tongDonHomNay - soDonDangGiao));
+        donHangHoanTat.setText(String.valueOf(count));
 
     }
 

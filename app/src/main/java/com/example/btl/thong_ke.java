@@ -145,8 +145,7 @@ public class thong_ke extends AppCompatActivity {
                 } else if (type.equals("MONTH")) {
                     Calendar c1 = Calendar.getInstance();
                     c1.setTime(date);
-                    if (c1.get(Calendar.MONTH) == cal.get(Calendar.MONTH)
-                            && c1.get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
+                    if (c1.get(Calendar.MONTH) == cal.get(Calendar.MONTH) && c1.get(Calendar.YEAR) == cal.get(Calendar.YEAR)) {
                         ketQua.add(pc);
                     }
                 } else if (type.equals("YEAR")) {

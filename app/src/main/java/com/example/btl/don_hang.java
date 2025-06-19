@@ -74,7 +74,8 @@ public class don_hang extends AppCompatActivity {
             }
         });
 
-        btnBack.setOnClickListener(new View.OnClickListener() {
+        btnBack.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View view) {
                 navigateBack();
@@ -87,16 +88,19 @@ public class don_hang extends AppCompatActivity {
         });
     }
 
-    private void LoadUsername() {
+    private void LoadUsername()
+    {
         Intent intent = getIntent();
         username = intent.getStringExtra("username");
     }
 
-    void loadData() {
+    void loadData()
+    {
         list.clear();
         try (SQLiteDatabase db = dbHelper.getReadableDatabase()) {
             Cursor cursor = db.rawQuery("SELECT * FROM DonHang", null);
-            while (cursor.moveToNext()) {
+            while (cursor.moveToNext())
+            {
                 list.add(cursor.getString(0));
             }
             cursor.close();
@@ -105,7 +109,8 @@ public class don_hang extends AppCompatActivity {
         adapter.notifyDataSetChanged();
     }
 
-    void insertDonHang() {
+    void insertDonHang()
+    {
         String maDon = edtOrderCode.getText().toString().trim();
         if (maDon.isEmpty()) {
             showToast("Vui lòng nhập mã đơn");
@@ -115,9 +120,12 @@ public class don_hang extends AppCompatActivity {
             ContentValues values = new ContentValues();
             values.put("maDon", maDon);
             long result = db.insert("DonHang", null, values);
-            if (result == -1) {
+            if (result == -1)
+            {
                 showToast("Mã đơn đã tồn tại");
-            } else {
+            }
+            else
+            {
                 showToast("Thêm thành công");
                 edtOrderCode.setText("");
                 loadData();
@@ -151,8 +159,10 @@ public class don_hang extends AppCompatActivity {
         }
     }
 
-    void deleteDonHang() {
-        if (selectedIndex == -1) {
+    void deleteDonHang()
+    {
+        if (selectedIndex == -1)
+        {
             showToast("Chọn mã đơn để xóa");
             return;
         }
@@ -177,12 +187,14 @@ public class don_hang extends AppCompatActivity {
                 .show();
     }
 
-    void navigateBack() {
+    void navigateBack()
+    {
         startActivity(new Intent(don_hang.this, trang_chu.class));
         finish();
     }
 
-    void showToast(String message) {
+    void showToast(String message)
+    {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 }
